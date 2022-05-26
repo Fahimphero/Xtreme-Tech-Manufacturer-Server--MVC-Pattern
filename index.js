@@ -31,7 +31,9 @@ async function run() {
 
         const partsCollection = client.db('XtremeTech').collection('Parts');
         const clientPartsCollection = client.db('XtremeTech').collection('Clientparts');
-        const paymentCollection = client.db('XtremeTech').collection('payments');
+        const paymentCollection = client.db('XtremeTech').collection('Payments');
+        const reviewsCollection = client.db('XtremeTech').collection('Reviews');
+        const usersCollection = client.db('XtremeTech').collection('Users');
 
         app.get('/part', async (req, res) => {
             const query = {};
@@ -110,6 +112,48 @@ async function run() {
             const query = { _id: ObjectId(id) };
             const part = await clientPartsCollection.findOne(query);
             res.send(part);
+        })
+
+        // Client Reviews
+        app.post('/clientreviews', async (req, res) => {
+            const clientReviews = req.body;
+            const result = await reviewsCollection.insertOne(clientReviews);
+            res.send(result)
+        })
+        app.get('/clientreviews', async (req, res) => {
+            const query = {};
+            const cursor = reviewsCollection.find(query);
+            const reviews = await cursor.toArray();
+            res.send(reviews);
+        })
+
+        // User Profile
+        // app.post('/userinfo', async (req, res) => {
+        //     const userInfo = req.body;
+        //     const result = await usersCollection.insertOne(userInfo);
+        //     res.send(result);
+
+        // })
+
+        app.put('/userinfo/:email', async (req, res) => {
+            const email = req.params.email;
+            const update = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    userName: update.user,
+                    email: update.email,
+                    education: update.education,
+                    location: update.location,
+                    phoneNumber: update.phoneNumber,
+                    linkedinProfile: update.linkedin
+
+                }
+            };
+            const result = await usersCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+
         })
 
     }
