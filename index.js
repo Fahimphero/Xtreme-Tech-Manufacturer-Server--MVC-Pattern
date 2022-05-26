@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config()
 const port = process.env.PORT || 5000
 const app = express();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // middleware
 app.use(cors());
@@ -49,6 +50,33 @@ async function run() {
             res.send(result)
         })
 
+        // Client Products
+        app.get('/clientparts/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            // const query = {};
+            const cursor = clientPartsCollection.find(query);
+            const parts = await cursor.toArray();
+            res.send(parts);
+        })
+
+        app.delete('/clientparts/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await clientPartsCollection.deleteOne(query);
+
+            res.send(result);
+
+
+        })
+
+
+        app.get('/clientpart/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const part = await clientPartsCollection.findOne(query);
+            res.send(part);
+        })
 
     }
 
