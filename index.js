@@ -5,6 +5,8 @@ const port = process.env.PORT || 5000
 const app = express();
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
+
+
 // middleware
 app.use(cors());
 app.use(express.json());
@@ -29,6 +31,8 @@ async function run() {
 
         const partsCollection = client.db('XtremeTech').collection('Parts');
         const clientPartsCollection = client.db('XtremeTech').collection('Clientparts');
+        const paymentCollection = client.db('XtremeTech').collection('payments');
+
         app.get('/part', async (req, res) => {
             const query = {};
             const cursor = partsCollection.find(query);
@@ -42,6 +46,20 @@ async function run() {
             const part = await partsCollection.findOne(query);
             res.send(part);
         })
+
+        app.post('/create-payment-intent', async (req, res) => {
+            const service = req.body;
+            const price = service.price;
+            const amount = price * 100;
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount,
+                currency: 'usd',
+                payment_method_types: ['card']
+            });
+            res.send({ clientSecret: paymentIntent.client_secret })
+        });
+
+
 
         // Client Section
         app.post('/clientparts', async (req, res) => {
@@ -58,6 +76,22 @@ async function run() {
             const cursor = clientPartsCollection.find(query);
             const parts = await cursor.toArray();
             res.send(parts);
+        })
+
+        app.patch('/clientparts/:id', async (req, res) => {
+            const id = req.params.id;
+            const payment = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updatedDoc = {
+                $set: {
+                    paid: true,
+                    transactionId: payment.transactionId
+                }
+            }
+
+            const result = await paymentCollection.insertOne(payment);
+            const updatedBooking = await clientPartsCollection.updateOne(filter, updatedDoc);
+            res.send(updatedBooking);
         })
 
         app.delete('/clientparts/:id', async (req, res) => {
