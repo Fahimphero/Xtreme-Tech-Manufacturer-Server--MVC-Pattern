@@ -110,17 +110,17 @@ async function run() {
         })
 
         // Client Reviews
-        app.post('/clientreviews', async (req, res) => {
-            const clientReviews = req.body;
-            const result = await reviewsCollection.insertOne(clientReviews);
-            res.send(result)
-        })
-        app.get('/clientreviews', async (req, res) => {
-            const query = {};
-            const cursor = reviewsCollection.find(query);
-            const reviews = await cursor.toArray();
-            res.send(reviews);
-        })
+        // app.post('/clientreviews', async (req, res) => {
+        //     const clientReviews = req.body;
+        //     const result = await reviewsCollection.insertOne(clientReviews);
+        //     res.send(result)
+        // })
+        // app.get('/clientreviews', async (req, res) => {
+        //     const query = {};
+        //     const cursor = reviewsCollection.find(query);
+        //     const reviews = await cursor.toArray();
+        //     res.send(reviews);
+        // })
 
 
 
