@@ -155,32 +155,25 @@ async function run() {
             res.send(users);
         })
 
-        app.get('/admin/:email', async (req, res) => {
-            const email = req.params.email;
-            const user = await usersCollection.findOne({ email: email })
-            const isAdmin = user.role === 'admin'
-            res.send({ admin: isAdmin })
-        })
+        // app.get('/admin/:email', async (req, res) => {
+        //     const email = req.params.email;
+        //     const user = await usersCollection.findOne({ email: email })
+        //     const isAdmin = user.role === 'admin'
+        //     res.send({ admin: isAdmin })
+        // })
 
 
         // Make Admin
         app.put('/userinfo/admin/:email', async (req, res) => {
             const email = req.params.email;
-            const requestor = req.params.email;
-            const requestorAccount = await usersCollection.findOne({ email: requestor })
-            if (requestorAccount.role === 'admin') {
-                const filter = { email: email };
-                const updatedDoc = {
-                    $set: {
-                        role: 'admin'
-                    }
-                };
-                const result = await usersCollection.updateOne(filter, updatedDoc);
-                res.send(result);
-            }
-            else {
-                res.status(403).send({ message: 'forbidden' })
-            }
+            const filter = { email: email };
+            const updatedDoc = {
+                $set: {
+                    role: 'admin'
+                }
+            };
+            const result = await usersCollection.updateOne(filter, updatedDoc);
+            res.send(result);
 
         })
     }
