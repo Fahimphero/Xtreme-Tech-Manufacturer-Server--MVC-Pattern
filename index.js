@@ -148,6 +148,24 @@ async function run() {
         })
 
 
+        app.put('/userbasicinfo/:email', async (req, res) => {
+            const email = req.params.email;
+            const update = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    userName: update.user,
+                    email: update.email,
+
+                }
+            };
+            const result = await usersCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+
+        })
+
+
         app.get('/users', async (req, res) => {
             const query = {};
             const cursor = usersCollection.find(query);
