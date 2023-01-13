@@ -57,6 +57,11 @@ router
     .post(partControllers.saveAllPart);
 
 
-router.route("/:id").get(viewCount, limiter, partControllers.getPartDetail);
+router
+    .route("/:id")
+    .get(viewCount, limiter, partControllers.getPartDetail)
+    .patch(partControllers.updatePart)
+    .delete(partControllers.deletePart)
+
 
 module.exports = router;
